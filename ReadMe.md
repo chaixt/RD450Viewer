@@ -1,6 +1,6 @@
-#Õë¶ÔThinkServer RD450ËùÊ¹ÓÃµÄ¹ÜÀí³ÌÐò
+# é’ˆå¯¹ThinkServer RD450æ‰€ä½¿ç”¨çš„ç®¡ç†ç¨‹åº
 
-##ÒÀÀµÏî
+##ä¾èµ–é¡¹
  - jre 6+
  - python 2.7
  - urllib 0.1.12+
@@ -8,14 +8,14 @@
  - certifi 2017.7.27.1+
  
  
-##Ê¹ÓÃ·½Ê½
+## ä½¿ç”¨æ–¹å¼
 ```
-python pyviewer.py Ö÷»úÃû ÓÃ»§Ãû ÃÜÂë [´úÀíip ´úÀí¶Ë¿Ú]
+python pyviewer.py ä¸»æœºå ç”¨æˆ·å å¯†ç  [ä»£ç†ip ä»£ç†ç«¯å£]
 ```
- - Ö÷»úÃûÎª·þÎñÆ÷¹ÜÀí¶Ë¿Úip
- - ÓÃ»§ÃûÃÜÂëÎª¹ÜÀí¶ËWEBµÄµÇÂ½ÓÃ»§ÃûÃÜÂë
- - ´úÀí²ÉÓÃsocks4/5£¬¿ÉÊ¹ÓÃsshËíµÀ
+ - ä¸»æœºåä¸ºæœåŠ¡å™¨ç®¡ç†ç«¯å£ip
+ - ç”¨æˆ·åå¯†ç ä¸ºç®¡ç†ç«¯WEBçš„ç™»é™†ç”¨æˆ·åå¯†ç 
+ - ä»£ç†é‡‡ç”¨socks4/5ï¼Œå¯ä½¿ç”¨sshéš§é“
  
  
-##×¢Òâ
-¸Ã³ÌÐòÄ¬ÈÏÎªWin64£¬ÈçÐèÒªWin32£¬½«Win32.jar½âÑ¹Ìæ»»dll
+## æ³¨æ„
+è¯¥ç¨‹åºé»˜è®¤ä¸ºWin64ï¼Œå¦‚éœ€è¦Win32ï¼Œå°†Win32.jarè§£åŽ‹æ›¿æ¢dll
