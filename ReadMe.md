@@ -9,8 +9,9 @@
  
  
 ## 使用方式
+${Server}有ThinkServerRD450/DellR430/IBMx3650M5
 ```
-python pyviewer.py 主机名 用户名 密码 [代理ip 代理端口]
+python ${Server}.py 主机名 用户名 密码 [代理ip 代理端口]
 ```
  - 主机名为服务器管理端口ip
  - 用户名密码为管理端WEB的登陆用户名密码
@@ -18,4 +19,4 @@ python pyviewer.py 主机名 用户名 密码 [代理ip 代理端口]
  
  
 ## 注意
-该程序默认为Win64，如需要Win32，将Win32.jar解压替换dll
+只考虑Windows。Java虚拟机需要与系统一致，根据系统的位数加载动态库

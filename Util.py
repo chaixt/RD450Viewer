@@ -1,20 +1,18 @@
 #coding=utf-8
 '''
 Created on 2019-04-14
-@author: Êü¥ÂêëÂÅú
-@description: RD450ËøúÁ®ãÁôªÈôÜÁ®ãÂ∫è
-‰æùËµñÂ∫ì(ÈùûÁ≥ªÁªüÂ∫ì)Ôºö
+@author: ≤ÒœÚÕ£
+@description: RD450‘∂≥Ãµ«¬Ω≥Ã–Ú
+“¿¿µø‚(∑«œµÕ≥ø‚)£∫
 		urllib (0.1.12)
 		pycurl (7.19.5.3)
 '''
 
-import os;
-import sys;
 import urllib;
 import pycurl;
 import StringIO;
-import collections;
 import certifi;
+import platform;
 
 def Map2UrlList(amap):
 	rtList = [];
@@ -32,13 +30,12 @@ def Dump2File(filename, str):
 	output = open(filename, "w");
 	output.write(str);
 	output.close();
+def HttpOperDebug(debug_type, debug_msg):
+	print "debug(%d): %s" % (debug_type, debug_msg)
 
 
-__version__ = "0.1";
-
-
-class HttpRequest:
-	def __init__(self):
+class HttpOper:
+	def __init__(self, isDebug=False):
 		self.curl = pycurl.Curl();
 		self.curl.setopt(pycurl.CAINFO, certifi.where())
 		self.curl.setopt(pycurl.SSL_VERIFYPEER, False);
@@ -48,6 +45,9 @@ class HttpRequest:
 		self.curl.setopt(pycurl.COOKIEFILE,"");
 		self.curl.setopt(pycurl.CONNECTTIMEOUT, 60);
 		self.curl.setopt(pycurl.TIMEOUT, 120);
+		if isDebug:
+			self.curl.setopt(pycurl.VERBOSE, 1)
+			self.curl.setopt(pycurl.DEBUGFUNCTION, HttpOperDebug);
 		self.isDump = False;
 
 	def __del__(self):
@@ -60,7 +60,10 @@ class HttpRequest:
 			self.curl.setopt(pycurl.PROXYUSERPWD, up)
 			
 	def setCookie(self, cookieMap):
-		self.curl.setopt(pycurl.COOKIE, ";".join(Map2UrlList(cookieMap)));
+		self.curl.setopt(pycurl.COOKIE, cookieMap if type(cookieMap) == str else ";".join(Map2UrlList(cookieMap)));
+	
+	def setReferer(self, url):
+		self.curl.setopt(pycurl.REFERER, url);
 		
 	def Request(self):
 		self.curl.perform();
@@ -86,43 +89,16 @@ class HttpRequest:
 		self.curl.setopt(pycurl.URL, url);
 		self.curl.setopt(pycurl.POSTFIELDS, "&".join(Map2UrlList(dataMap)));
 		return self.Request();
-
-hasProxy=False;
-phost="127.0.0.1";
-pport=1080;
-host="127.0.0.1"
-user="root"
-pwd="root"
-
-if(len(sys.argv) < 4):
-	print "%s host user password [proxyhost proxyport]"%sys.argv[0]
-	exit();
-	
-host=sys.argv[1];
-user=sys.argv[2];
-pwd=sys.argv[3];
-if len(sys.argv) > 4:
-	hasProxy=True;
-	phost=sys.argv[4];
-	if len(sys.argv) > 5:
-		pport=sys.argv[5];
+	def GetCode(self):
+		return self.curl.getinfo(pycurl.HTTP_CODE)
+	def GetCookie(self):
+		return self.curl.getinfo(pycurl.INFO_COOKIELIST);
 
 
-userinfo = {
-	"WEBVAR_USERNAME":user,
-	"WEBVAR_PASSWORD":pwd
-};
 
-def buildRequest():
-	r = HttpRequest();
-	if hasProxy:
-		r.setProxy("%s:%d"%(phost, pport));
-	return r;
-def runJar(jar, jparams):
-	if hasProxy:
-		os.system("cd lib && java -DproxySet=true -DsocksProxyHost=%s -DsocksProxyPort=%d -jar %s %s"%(phost, pport, jar, jparams));
-	else:
-		os.system("cd lib && java -jar %s %s"%(jar, jparams));
+def getMachine():
+	return platform.machine()[-2:];
+		
 def findmid(s, b, e):
 	r=None;
 	ibegin=s.find(b);
@@ -132,23 +108,12 @@ def findmid(s, b, e):
 		if(iend >= 0):
 			r = s[ibegin:iend];
 	return r;
-
-if __name__ == '__main__':
-	m = buildRequest();
-	cinfo=m.PostUrl('https://%s/rpc/WEBSES/create.asp'%host, userinfo);
-	sc=findmid(cinfo, "'SESSION_COOKIE' : '", "'");
-	ip=findmid(cinfo, "'BMC_IP_ADDR' : '", "'");
-	tk=findmid(cinfo, "'CSRFTOKEN' : '", "'");
-	if sc != None and ip != None and tk != None:
-		m = buildRequest();
-		m.setCookie({
-			"SessionCookie":sc,
-			"BMC_IP_ADDR":ip,
-			"CSRFTOKEN":tk
-		});
-		jnlp=m.GetUrl("https://%s/Java/jviewer.jnlp?EXTRNIP=%s&JNLPSTR=JViewer"%(host, ip));
-		jparams=findmid(jnlp,"<application-desc>", "</application-desc>");
-		jparams=jparams.replace("<argument>", "").replace("</argument>", " ").replace("\n", "");
-		runJar("JViewer.jar", jparams);
-	else:
-		print "Login Fail!"
+	
+def findleft(s, b):
+	r=None;
+	ibegin=s.find(b);
+	if(ibegin >= 0):
+		ibegin=ibegin + len(b);
+		r = s[ibegin:];
+	return r;
+	
