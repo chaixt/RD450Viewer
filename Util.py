@@ -36,12 +36,15 @@ def HttpOperDebug(debug_type, debug_msg):
 
 class HttpOper:
 	def __init__(self, isDebug=False):
+		self.headers = "";
 		self.curl = pycurl.Curl();
 		self.curl.setopt(pycurl.CAINFO, certifi.where())
 		self.curl.setopt(pycurl.SSL_VERIFYPEER, False);
 		self.curl.setopt(pycurl.SSL_VERIFYHOST, False);
-		self.strio = StringIO.StringIO();
-		self.curl.setopt(pycurl.WRITEFUNCTION, self.strio.write);
+		self.bodyio = StringIO.StringIO();
+		self.headerio = StringIO.StringIO();
+		self.curl.setopt(pycurl.WRITEFUNCTION, self.bodyio.write);
+		self.curl.setopt(pycurl.HEADERFUNCTION, self.headerio.write);
 		self.curl.setopt(pycurl.COOKIEFILE,"");
 		self.curl.setopt(pycurl.CONNECTTIMEOUT, 60);
 		self.curl.setopt(pycurl.TIMEOUT, 120);
@@ -61,14 +64,19 @@ class HttpOper:
 			
 	def setCookie(self, cookieMap):
 		self.curl.setopt(pycurl.COOKIE, cookieMap if type(cookieMap) == str else ";".join(Map2UrlList(cookieMap)));
-	
+		
+	def setHeaders(self, headers):
+		self.curl.setopt(pycurl.HTTPHEADER, headers);
+		
 	def setReferer(self, url):
 		self.curl.setopt(pycurl.REFERER, url);
 		
 	def Request(self):
 		self.curl.perform();
-		rslt = self.strio.getvalue();
-		self.strio.truncate(0);
+		rslt = self.bodyio.getvalue();
+		self.headers = self.headerio.getvalue();
+		self.headerio.truncate(0);
+		self.bodyio.truncate(0);
 		return rslt;
 
 	def setDump(self, isDump):
@@ -91,8 +99,22 @@ class HttpOper:
 		return self.Request();
 	def GetCode(self):
 		return self.curl.getinfo(pycurl.HTTP_CODE)
+		
+	def GetCookies(self):
+		rcs=[];
+		cookies = self.curl.getinfo(pycurl.INFO_COOKIELIST);
+		if cookies != None and type(cookies) == list:
+			for c in cookies:
+				xc = c.split("\t");
+				rcs.append("%s=%s" % (xc[5], xc[6]));
+		return rcs;
+		
 	def GetCookie(self):
 		return self.curl.getinfo(pycurl.INFO_COOKIELIST);
+				
+	def GetRespHeaders(self):
+		return self.headers;
+		
 
 
 
